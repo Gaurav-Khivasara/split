@@ -1,0 +1,96 @@
+[
+  {
+    "route": "/expenses/get-all-by-group-id/:groupId",
+    "splitwiseCredentials": "U6-fix.om27814@mvpmedix.com, U5-fere.nox704@hadvar.com, U4-vafe.waf758@kissgy.com, U2-beho.co8687@mvpmedix.com"
+  },
+  {
+    "totExpenses": 2,
+    "expenseCount": 8,
+    "expenses": [
+      {
+        "id": 1,
+        "description": "Abc",
+        "cost": "240.00",
+        "user_id": 1,
+        "amount_paid": "80.00",
+        "share_amount": "60.00"
+      },
+      {
+        "id": 1,
+        "description": "Abc",
+        "cost": "240.00",
+        "user_id": 2,
+        "amount_paid": "80.00",
+        "share_amount": "60.00"
+      },
+      {
+        "id": 1,
+        "description": "Abc",
+        "cost": "240.00",
+        "user_id": 3,
+        "amount_paid": "80.00",
+        "share_amount": "60.00"
+      },
+      {
+        "id": 1,
+        "description": "Abc",
+        "cost": "240.00",
+        "user_id": 4,
+        "amount_paid": "0.00",
+        "share_amount": "60.00"
+      },
+      {
+        "id": 2,
+        "description": "Xyz",
+        "cost": "270.00",
+        "user_id": 1,
+        "amount_paid": "0.00",
+        "share_amount": "135.00"
+      },
+      {
+        "id": 2,
+        "description": "Xyz",
+        "cost": "270.00",
+        "user_id": 2,
+        "amount_paid": "0.00",
+        "share_amount": "135.00"
+      },
+      {
+        "id": 2,
+        "description": "Xyz",
+        "cost": "270.00",
+        "user_id": 3,
+        "amount_paid": "135.00",
+        "share_amount": "0.00"
+      },
+      {
+        "id": 2,
+        "description": "Xyz",
+        "cost": "270.00",
+        "user_id": 4,
+        "amount_paid": "135.00",
+        "share_amount": "0.00"
+      }
+    ]
+  },
+  {
+    "balances": [
+      {
+        "user_id": 1,
+        "balance_amount": -115
+      },
+      {
+        "user_id": 2,
+        "balance_amount": -115
+      },
+      {
+        "user_id": 3,
+        "balance_amount": 155
+      },
+      {
+        "user_id": 4,
+        "balance_amount": 75
+      }
+    ]
+  }
+]

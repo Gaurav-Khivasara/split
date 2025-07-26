@@ -1,14 +1,15 @@
-import { createServer } from 'http';
+require('dotenv').config();
 
-const server = createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/html' });
+const express = require('express');
+const app = express();
+const port = process.env.PORT;
 
-  res.write('<h1>Hello, Node.js HTTP Server!</h1>');
-  res.end();
-});
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-const port = 3000;
+const apiRouters = require('./routers/apiRouters');
+app.use('/api', apiRouters);
 
-server.listen(port, () => {
-  console.log(`Node.js HTTP server is running on port ${port}`);
+app.listen(port, () => {
+  console.log(`${process.env.LINK}:${port}`)
 });
