@@ -4,6 +4,19 @@ const router = express.Router();
 const db = require('../config/db');
 const sendMail = require('../config/email');
 
+const crypto = require('crypto');
+
+function generateRequestCode() {
+  const alphaNumerics = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456';
+  
+  let requestCode = '';
+  for (let i = 0; i < 6; i++) {
+    requestCode += alphaNumerics[Math.floor(Math.random() * 62)];
+  }
+
+  return requestCode;
+}
+
 router.get('/', (req, res) => {
   res.status(200).json({ message: 'This is friends route' });
 });
@@ -30,11 +43,16 @@ router.post('/add', async (req, res) => {
       pendingFriendRequestError.code = '23505';
       throw pendingFriendRequestError;
     }
-
+    
+    const requestCode = generateRequestCode();
+    const requestHash = crypto.createHash('sha256').update(sentBy + requestCode + sentTo).digest('hex');
+    console.log("::" + sentBy + requestCode + sentTo);
+    console.log("::" + requestHash);
+    
     await db.query(
-      `INSERT INTO friends (sent_by, sent_to)
-      VALUES ($1, $2) RETURNING *`,
-      [sentBy, sentTo]
+      `INSERT INTO friends (sent_by, sent_to, request_hash)
+      VALUES ($1, $2, $3) RETURNING *`,
+      [sentBy, sentTo, requestHash]
     );
     
     // TODO 0
@@ -44,17 +62,36 @@ router.post('/add', async (req, res) => {
       [sentBy, sentTo]
     )).rows;
 
-    // TODO 5
-    // Email acceptance of friend request not completed, use some code for that request verification
+    // Friend request can be accepted only in the app, email link will redirect to the in-app activities
+      // list where accept button for the request will be there
+    // No need for this, because at last while verifying with DB the request won't exist
+    // So, accept button will be there in both Email and in-app activities
 
     const html = `
     <html>
       <head>
         <title>Friend Request</title>
+        <style>
+          a {
+          	display: block;
+            width: 16vw;
+            border: 1.5px solid black;
+            text-align: center;
+            text-decoration: none;
+            font-size: 3vw;
+            background-color: #00ce52;
+            color: #FFF;
+            padding: 1.5vh 0;
+            border-radius: 1.5vh;
+          }
+          a:hover {
+          	box-shadow: 1px 1px 0px #000000;
+          }
+        </style>
       </head>
       <body>
-        <h2>${sentByEmail} has sent a friend request</h2>
-        <a href="${process.env.LINK}:${process.env.PORT}/api/friends/accept-request/" >Accept</a>
+        <h2>user has sent a friend request</h2>
+        <a href="${process.env.LINK}:${process.env.PORT}/api/friends/accept?request=${sentTo}-${requestCode}-${sentBy}" >Accept</a>
       </body>
     <html>`;
       
@@ -65,11 +102,12 @@ router.post('/add', async (req, res) => {
       // Date Time
     // Add to activities table (activities for each user will be different)
       // Instead of adding to activities table (as no table for frined activities)
-      // Just add to activities whenever a request is sent and if it is accepted it will
+      // Just add to activities list in app whenever a request is sent and if it is accepted it will
         // disappear from the list
 
     // TODO GLOBAL
     // Transactions for DB
+      // Including updated_at COLUMNS of related Tables
 
     res.status(201).json({
       message: 'Friend request sent successfully!',
@@ -109,6 +147,37 @@ router.get('/get-all-by-user-id/:userId', async (req, res) => {
     console.error('Error fetching all friends:', err.message);
 
     if (err.code === '00000') {
+      res.status(403).json({ message: err.message });
+    } else {
+      res.status(500).json({ message: 'An error occured!' });
+    }
+  }
+});
+
+router.put('/accept', async (req, res) => {
+  const friendRequest = req.query.request;
+  const [sentTo, requestCode, sentBy] = friendRequest.split('-');
+  const requestHash = crypto.createHash('sha256').update(sentBy + requestCode + sentTo).digest('hex');
+
+  try {
+    const rowCount = (await db.query(
+      `UPDATE friends SET are_friends = true
+      WHERE request_hash = $1 AND are_friends = false
+      RETURNING *`,
+      [requestHash]
+    )).rowCount;
+
+    if (rowCount == 0) {
+      const noFreindRequestError = new Error('No friend request exist!');
+      noFreindRequestError.code === '000000';
+      throw noFreindRequestError;
+    }
+    
+    res.status(200).json({ message: '' });
+  } catch (err) {
+    console.error('Error accepting request:', err.message);
+
+    if (err.code === '000000') {
       res.status(403).json({ message: err.message });
     } else {
       res.status(500).json({ message: 'An error occured!' });
