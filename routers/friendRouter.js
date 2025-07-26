@@ -168,9 +168,9 @@ router.put('/accept', async (req, res) => {
     )).rowCount;
 
     if (rowCount == 0) {
-      const noFreindRequestError = new Error('No friend request exist!');
-      noFreindRequestError.code === '000000';
-      throw noFreindRequestError;
+      const noFriendRequestError = new Error('No pending friend request exist OR Already friends!');
+      noFriendRequestError.code = '000000';
+      throw noFriendRequestError;
     }
     
     res.status(200).json({ message: '' });
