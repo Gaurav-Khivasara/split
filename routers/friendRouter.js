@@ -19,21 +19,24 @@ router.post('/add', async (req, res) => {
       throw sameIdsFriendError;
     }
 
-    const rowCount = (await db.query(
-      `INSERT INTO friends (sent_by, sent_to)
-      SELECT $1, $2 WHERE NOT EXISTS (
-        SELECT 1 FROM friends
-        WHERE (sent_to = $1 AND sent_by = $2) OR (sent_by = $1 AND sent_to = $2)
-      ) RETURNING *`,
+    const isRequestSent = (await db.query(
+      `SELECT * FROM friends
+      WHERE (sent_to = $1 AND sent_by = $2) OR (sent_by = $1 AND sent_to = $2)`,
       [sentBy, sentTo]
-    )).rowCount;
+    )).rowCount !== 0;
 
-    if (rowCount == 0) {
+    if (isRequestSent) {
       const pendingFriendRequestError = new Error(`A request is already is sent!`);
       pendingFriendRequestError.code = '23505';
       throw pendingFriendRequestError;
     }
 
+    await db.query(
+      `INSERT INTO friends (sent_by, sent_to)
+      VALUES ($1, $2) RETURNING *`,
+      [sentBy, sentTo]
+    );
+    
     // TODO 0
     // Send email friend request with accept button
     const [{ email: sentByEmail }, { email: sentToEmail }] = (await db.query(
@@ -57,17 +60,16 @@ router.post('/add', async (req, res) => {
       
     // sendMail(sentToEmail, 'New Friend Request', html);
 
-    // TODO 2
-    // Add to activities table (activities for each user will be different)
+    // TODO Front-end
     // users({sentBy}).name sent a request to users({sentTo}).name -- Accept button
       // Date Time
-    
-    // TODO 4
-    // If friend has been removed then while sending request an error will be shown
-    // check whether they are friends or not and then insert or throw error
+    // Add to activities table (activities for each user will be different)
+      // Instead of adding to activities table (as no table for frined activities)
+      // Just add to activities whenever a request is sent and if it is accepted it will
+        // disappear from the list
 
     // TODO GLOBAL
-    // Transaction for DB
+    // Transactions for DB
 
     res.status(201).json({
       message: 'Friend request sent successfully!',
