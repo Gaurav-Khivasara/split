@@ -61,34 +61,37 @@ router.get('/', (req, res) => {
 //   `);
 // });
 
-router.post('/register', async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-    console.log('Request -- User details:', name + ', ' + email + ', ' + password);
+// Not required as using Google OAuth 2.0
+// router.post('/register', async (req, res) => {
+//   try {
+//     const { name, email, password } = req.body;
+//     console.log('Request -- User details:', name + ', ' + email + ', ' + password);
 
-    const passwordHash = await bcrypt.hash(password, 10);
+//     // TODO 0
+//     // passwordHash and password_hash not needed as using Google OAuth 2.0
+//     const passwordHash = await bcrypt.hash(password, 10);
 
-    // const result = await db.query(
-    await db.query(
-      `INSERT INTO users (name, email, password_hash)
-      VALUES ($1, $2, $3) RETURNING *`,
-      [name, email, passwordHash]
-    );
+//     // const result = await db.query(
+//     await db.query(
+//       `INSERT INTO users (name, email, password_hash)
+//       VALUES ($1, $2, $3) RETURNING *`,
+//       [name, email, passwordHash]
+//     );
 
-    res.status(201).json({
-      message: 'User created successfully!',
-      name,
-      email
-    });
-  } catch (err) {
-    console.error('Error inserting user:', err.message);
+//     res.status(201).json({
+//       message: 'User created successfully!',
+//       name,
+//       email
+//     });
+//   } catch (err) {
+//     console.error('Error inserting user:', err.message);
 
-    if (err.code === '23505') {
-      res.status(409).json({ message: 'Email already exist!' });
-    } else {
-      res.status(500).json({ message: 'An error occured!' });
-    }
-  }
-});
+//     if (err.code === '23505') {
+//       res.status(409).json({ message: 'Email already exist!' });
+//     } else {
+//       res.status(500).json({ message: 'An error occured!' });
+//     }
+//   }
+// });
 
 module.exports = router;

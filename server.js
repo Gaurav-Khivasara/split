@@ -1,15 +1,41 @@
 require('dotenv').config();
+const link = process.env.LINK;
+const port = process.env.PORT;
 
 const express = require('express');
+const jwt = require('jsonwebtoken');
+
 const app = express();
-const port = process.env.PORT;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+require('./config/passport');
+
+const authRouter = require('./routers/authRouter');
+app.use('/auth/google', authRouter);
+
 const apiRouters = require('./routers/apiRouters');
-app.use('/api', apiRouters);
+app.use('/api', (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Missing or Invalid token!' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error('JWT middleware auth error:', err.message);
+
+    res.status(401).json({ message: 'Invalid token!' });
+  }
+}, apiRouters);
 
 app.listen(port, () => {
-  console.log(`${process.env.LINK}:${port}`)
+  console.log(`${link}:${port}`)
 });
