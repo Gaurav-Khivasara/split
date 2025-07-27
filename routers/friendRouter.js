@@ -1,3 +1,6 @@
+const link = process.env.LINK;
+const port = process.env.PORT;
+
 const express = require('express');
 const router = express.Router();
 
@@ -36,7 +39,7 @@ router.post('/add', async (req, res) => {
       `SELECT * FROM friends
       WHERE (sent_to = $1 AND sent_by = $2) OR (sent_by = $1 AND sent_to = $2)`,
       [sentBy, sentTo]
-    )).rowCount !== 0;
+    )).rowCount > 0;
 
     if (isRequestSent) {
       const pendingFriendRequestError = new Error(`A request is already is sent!`);
@@ -91,7 +94,7 @@ router.post('/add', async (req, res) => {
       </head>
       <body>
         <h2>user has sent a friend request</h2>
-        <a href="${process.env.LINK}:${process.env.PORT}/api/friends/accept?request=${sentTo}-${requestCode}-${sentBy}" >Accept</a>
+        <a href="${link}:${port}/api/friends/accept?request=${sentTo}-${requestCode}-${sentBy}" >Accept</a>
       </body>
     <html>`;
       
