@@ -1,5 +1,5 @@
-const link = process.env.LINK;
-const port = process.env.PORT;
+const serverLink = process.env.SERVER_LINK;
+const serverPort = process.env.SERVER_PORT;
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
@@ -11,7 +11,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${link}:${port}/auth/google/callback`
+      callbackURL: `${serverLink}:${serverPort}/auth/google/callback`
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
