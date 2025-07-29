@@ -1,6 +1,9 @@
+// TODO 0
+// payments table in DB and its logic
+
 require('dotenv').config();
-const link = process.env.LINK;
-const port = process.env.PORT;
+const serverLink = process.env.SERVER_LINK;
+const serverPort = process.env.SERVER_PORT;
 
 const express = require('express');
 const jwt = require('jsonwebtoken');
@@ -36,6 +39,6 @@ app.use('/api', (req, res, next) => {
   }
 }, apiRouters);
 
-app.listen(port, () => {
-  console.log(`${link}:${port}`)
+app.listen(serverPort, () => {
+  console.log(`${serverLink}:${serverPort}`)
 });

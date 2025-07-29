@@ -1,5 +1,5 @@
-const link = process.env.LINK;
-const port = process.env.PORT;
+const serverLink = process.env.SERVER_LINK;
+const serverPort = process.env.SERVER_PORT;
 
 const express = require('express');
 const router = express.Router();
@@ -94,7 +94,7 @@ router.post('/add', async (req, res) => {
       </head>
       <body>
         <h2>user has sent a friend request</h2>
-        <a href="${link}:${port}/api/friends/accept?request=${sentTo}-${requestCode}-${sentBy}" >Accept</a>
+        <a href="${serverLink}:${serverPort}/api/friends/accept?request=${sentTo}-${requestCode}-${sentBy}" >Accept</a>
       </body>
     <html>`;
       

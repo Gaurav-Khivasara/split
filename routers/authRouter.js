@@ -1,5 +1,5 @@
-const link = process.env.LINK;
-const port = process.env.PORT;
+const frontendLink = process.env.FRONTEND_LINK;
+const frontendPort = process.env.FRONTEND_PORT;
 
 const express = require('express');
 const passport = require('passport');
@@ -10,7 +10,7 @@ router.get('/',
 );
 
 router.get('/callback',
-  passport.authenticate('google', { session: false, failureRedirect: `${link}:${port}` }),
+  passport.authenticate('google', { session: false, failureRedirect: `${frontendLink}:${frontendPort}` }),
   (req, res) => {
     const { user, token } = req.user;
     res.json({ token, user });
