@@ -22,18 +22,16 @@ passport.use(
           [googleId]
         );
 
-        let user;
+        let user = existingUser.rows[0];
         if (existingUser.rowCount == 0) {
           const newUser = await db.query(
             `INSERT INTO users (name, email, google_id)
             VALUES ($1, $2, $3) RETURNING *`,
-            [displayName, email, googleId]
+            [displayName, email.value, googleId]
           );
 
           user = newUser.rows[0];
         }
-
-        user = existingUser.rows[0];
 
         const token = jwt.sign(
           { id: user.id, email: user.email },
