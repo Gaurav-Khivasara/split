@@ -4,6 +4,8 @@
 require('dotenv').config();
 const serverLink = process.env.SERVER_LINK;
 const serverPort = process.env.SERVER_PORT;
+const frontendLink = process.env.FRONTEND_LINK;
+const frontendPort = process.env.FRONTEND_PORT;
 
 const express = require('express');
 const jwt = require('jsonwebtoken');
@@ -12,6 +14,11 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+const cors = require('cors');
+app.use(cors({
+  origin: `${frontendLink}:${frontendPort}}`
+}));
 
 require('./config/passport');
 
