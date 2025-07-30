@@ -17,7 +17,7 @@ app.use(express.json());
 
 const cors = require('cors');
 app.use(cors({
-  origin: `${frontendLink}:${frontendPort}}`
+  origin: `${frontendLink}:${frontendPort}`,
 }));
 
 require('./config/passport');
