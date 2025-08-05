@@ -1,16 +1,16 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const db = require('../config/db');
+const db = require("../config/db");
 
-router.get('/', (req, res) => {
-  res.status(200).json({ message: 'This is expense shares route' });
+router.get("", (req, res) => {
+  res.status(200).json({ message: "This is expense shares route" });
 });
 
-router.post('/add', async (req, res) => {
+router.post("/add", async (req, res) => {
   try {
     const { expenseId, userId, shareAmount } = req.body;
-    console.log('Request -- Expense & Share details:', expenseId + ', ' + userId + ', ' + shareAmount);
+    console.log("Request -- Expense & Share details:", expenseId + ", " + userId + ", " + shareAmount);
     
     const rowCount = (await db.query(
       `INSERT INTO shares (expense_id, user_id, share_amount)
@@ -23,8 +23,8 @@ router.post('/add', async (req, res) => {
     )).rowCount;
 
     if (rowCount == 0) {
-      const userNotInGroupError = new Error('User is not in the group associated with the expense OR The group does not exist!');
-      userNotInGroupError.code = '00000';
+      const userNotInGroupError = new Error("User is not in the group associated with the expense OR The group does not exist!");
+      userNotInGroupError.code = "00000";
       throw userNotInGroupError;
     }
 
@@ -38,26 +38,26 @@ router.post('/add', async (req, res) => {
       // corresponding to its expense
 
     res.status(201).json({
-      message: 'Expense share added successfully!',
+      message: "Expense share added successfully!",
       expenseDescription
     });
   } catch (err) {
-    console.error('Error adding share:', err.message);
+    console.error("Error adding share:", err.message);
 
-    if (err.code === '23505') {
-      res.status(409).json({ message: 'User share already exists for this expense!' });
-    } else if (err.code === '00000') {
+    if (err.code === "23505") {
+      res.status(409).json({ message: "User share already exists for this expense!" });
+    } else if (err.code === "00000") {
       res.status(403).json({ message: err.message });
     } else {
-      res.status(500).json({ message: 'An error occured!' });
+      res.status(500).json({ message: "An error occured!" });
     }
   }
 });
 
-router.get('/get-all-by-expense-id/:expenseId', async (req, res) => {
+router.get("/get-all-by-expense-id/:expenseId", async (req, res) => {
   try {
     const expenseId = req.params.expenseId;
-    console.log('Request -- Expense id:', expenseId);
+    console.log("Request -- Expense id:", expenseId);
 
     const { rowCount, rows } = await db.query(
       `SELECT user_id, share_amount FROM shares
@@ -71,19 +71,19 @@ router.get('/get-all-by-expense-id/:expenseId', async (req, res) => {
     // console.log(rows[0]);
 
     if (rowCount == 0) {
-      const noExpenseError = new Error('Expense does not exist!');
-      noExpenseError.code = '00000';
+      const noExpenseError = new Error("Expense does not exist!");
+      noExpenseError.code = "00000";
       throw noExpenseError;
     }
 
     res.status(200).json({ rowCount, expenseId, rows });
   } catch (err) {
-    console.error('Error fetching shares:', err.message);
+    console.error("Error fetching shares:", err.message);
 
-    if (err.code === '00000') {
+    if (err.code === "00000") {
       res.status(403).json({ message: err.message });
     } else {
-      res.status(500).json({ message: 'An error occured!' });
+      res.status(500).json({ message: "An error occured!" });
     }
   }
 });

@@ -1,10 +1,10 @@
 const serverLink = process.env.SERVER_LINK;
 const serverPort = process.env.SERVER_PORT;
 
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const db = require('./db');
-const jwt = require('jsonwebtoken');
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const db = require("./db");
+const jwt = require("jsonwebtoken");
 
 passport.use(
   new GoogleStrategy(
@@ -36,7 +36,7 @@ passport.use(
         const token = jwt.sign(
           { id: user.id, email: user.email },
           process.env.JWT_SECRET,
-          { expiresIn: '1d' }
+          { expiresIn: "1d" }
         );
 
         return done(null, { user, token });
