@@ -1,14 +1,14 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const bcrypt = require('bcrypt');
-const db = require('../config/db');
+const bcrypt = require("bcrypt");
+const db = require("../config/db");
 
-router.get('/', (req, res) => {
-  res.status(200).json({ message: 'This is users route' });
+router.get("", (req, res) => {
+  res.status(200).json({ message: "This is users route" });
 });
 
-// router.get('/register', (req, res) => {
+// router.get("/register", (req, res) => {
 //   res.send(`
 //     <html>
 //       <head>
@@ -62,10 +62,10 @@ router.get('/', (req, res) => {
 // });
 
 // Not required as using Google OAuth 2.0
-// router.post('/register', async (req, res) => {
+// router.post("/register", async (req, res) => {
 //   try {
 //     const { name, email, password } = req.body;
-//     console.log('Request -- User details:', name + ', ' + email + ', ' + password);
+//     console.log("Request -- User details:", name + ", " + email + ", " + password);
 
 //     // TODO 0
 //     // passwordHash and password_hash not needed as using Google OAuth 2.0
@@ -79,17 +79,17 @@ router.get('/', (req, res) => {
 //     );
 
 //     res.status(201).json({
-//       message: 'User created successfully!',
+//       message: "User created successfully!",
 //       name,
 //       email
 //     });
 //   } catch (err) {
-//     console.error('Error inserting user:', err.message);
+//     console.error("Error inserting user:", err.message);
 
-//     if (err.code === '23505') {
-//       res.status(409).json({ message: 'Email already exist!' });
+//     if (err.code === "23505") {
+//       res.status(409).json({ message: "Email already exist!" });
 //     } else {
-//       res.status(500).json({ message: 'An error occured!' });
+//       res.status(500).json({ message: "An error occured!" });
 //     }
 //   }
 // });

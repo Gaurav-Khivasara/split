@@ -1,16 +1,16 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const db = require('../config/db');
+const db = require("../config/db");
 
-router.get('/', (req, res) => {
-  res.json({ message: 'This is expenses route' });
+router.get("", (req, res) => {
+  res.json({ message: "This is expenses route" });
 });
 
-router.post('/add', async (req, res) => {
+router.post("/add", async (req, res) => {
   try {
     const { description, groupId, cost, addedBy } = req.body;
-    console.log('Request -- Expense details:', description + ', ' + groupId + ', ' + cost + ', ' + addedBy);
+    console.log("Request -- Expense details:", description + ", " + groupId + ", " + cost + ", " + addedBy);
 
     const { rowCount, rows: [{ id: expenseId }] } = await db.query(
       `INSERT INTO expenses (description, group_id, cost, added_by)
@@ -23,8 +23,8 @@ router.post('/add', async (req, res) => {
     );
 
     if (rowCount == 0) {
-      const userNotInGroupError = new Error('User is not in the group associated with the expense OR The group does not exist!');
-      userNotInGroupError.code = '00000';
+      const userNotInGroupError = new Error("User is not in the group associated with the expense OR The group does not exist!");
+      userNotInGroupError.code = "00000";
       throw userNotInGroupError;
     }
 
@@ -34,28 +34,28 @@ router.post('/add', async (req, res) => {
       // Date Time
     await db.query(
       `INSERT INTO expense_activities (performed_by, description, expense_id)
-      VALUES ($1, 'added', $2)`,
+      VALUES ($1, "added", $2)`,
       [addedBy, expenseId]
     );
 
     res.status(201).json({
-      message: 'Expense added successfully!',
+      message: "Expense added successfully!",
     });
   } catch (err) {
-    console.error('Error adding expense:', err.message);
+    console.error("Error adding expense:", err.message);
 
-    if (err.code === '00000') {
+    if (err.code === "00000") {
       res.status(403).json({ message: err.message });
     } else {
-      res.status(500).json({ message: 'An error occured!' });
+      res.status(500).json({ message: "An error occured!" });
     }
   }
 });
 
-router.get('/get-all-by-group-id/:groupId', async (req, res) => {
+router.get("/get-all-by-group-id/:groupId", async (req, res) => {
   try {
     const groupId = req.params.groupId;
-    console.log('Request -- Group id:', groupId);
+    console.log("Request -- Group id:", groupId);
 
     const { rowCount: expenseCount, rows: expenses } = await db.query(
       `SELECT e.id, e.description, e.cost,
@@ -79,8 +79,8 @@ router.get('/get-all-by-group-id/:groupId', async (req, res) => {
     // console.log(expenses[0]);
 
     if (expenseCount == 0) {
-      const groupNotFoundError = new Error('Group does not exist OR No expenses in the group!');
-      groupNotFoundError.code = '00000';
+      const groupNotFoundError = new Error("Group does not exist OR No expenses in the group!");
+      groupNotFoundError.code = "00000";
       throw groupNotFoundError;
     }
 
@@ -96,20 +96,20 @@ router.get('/get-all-by-group-id/:groupId', async (req, res) => {
 
     res.status(200).json({ totExpenses, expenseCount, expenses});
   } catch (err) {
-    console.error('Error fetching all expenses:', err.message);
+    console.error("Error fetching all expenses:", err.message);
 
-    if (err.code === '00000') {
+    if (err.code === "00000") {
       res.status(403).json({ message: err.message });
     } else {
-      res.status(500).json({ message: 'An error occured!' });
+      res.status(500).json({ message: "An error occured!" });
     }
   }
 });
 
-router.get('/get-all-by-user-id/:userId', async (req, res) => {
+router.get("/get-all-by-user-id/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
-    console.log('Request -- User id:', userId);
+    console.log("Request -- User id:", userId);
 
     // TODO NOW IF
     // This is found required while developing other required routes from Splitwise
@@ -140,19 +140,19 @@ router.get('/get-all-by-user-id/:userId', async (req, res) => {
     // console.log(expenses[0]);
 
     if (expenseCount == 0) {
-      const noExpenseForUserError = new Error('No expenses for this user!');
-      noExpenseForUserError.code = '00000';
+      const noExpenseForUserError = new Error("No expenses for this user!");
+      noExpenseForUserError.code = "00000";
       throw noExpenseForUserError;
     }
 
     res.status(200).json({ expenseCount, expenses});
   } catch (err) {
-    console.error('Error fetching all expenses:', err.message);
+    console.error("Error fetching all expenses:", err.message);
 
-    if (err.code === '00000') {
+    if (err.code === "00000") {
       res.status(403).json({ message: err.message });
     } else {
-      res.status(500).json({ message: 'An error occured!' });
+      res.status(500).json({ message: "An error occured!" });
     }
   }
 });

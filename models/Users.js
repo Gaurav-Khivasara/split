@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW,
     },
   }, {
-    tableName: 'users',
+    tableName: "users",
     timestamps: false,
   });
 };

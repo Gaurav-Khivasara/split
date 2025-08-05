@@ -1,18 +1,18 @@
 const serverLink = process.env.SERVER_LINK;
 const serverPort = process.env.SERVER_PORT;
 
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const db = require('../config/db');
-const sendMail = require('../config/email');
+const db = require("../config/db");
+const sendMail = require("../config/email");
 
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 function generateRequestCode() {
-  const alphaNumerics = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456';
+  const alphaNumerics = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456";
   
-  let requestCode = '';
+  let requestCode = "";
   for (let i = 0; i < 6; i++) {
     requestCode += alphaNumerics[Math.floor(Math.random() * 62)];
   }
@@ -20,18 +20,18 @@ function generateRequestCode() {
   return requestCode;
 }
 
-router.get('/', (req, res) => {
-  res.status(200).json({ message: 'This is friends route' });
+router.get("", (req, res) => {
+  res.status(200).json({ message: "This is friends route" });
 });
 
-router.post('/add', async (req, res) => {
+router.post("/add", async (req, res) => {
   try {
     const { sentBy, sentTo } = req.body;
-    console.log('Request -- Friend request details:', sentBy + ', ' + sentTo);
+    console.log("Request -- Friend request details:", sentBy + ", " + sentTo);
 
     if (sentBy == sentTo) {
-      const sameIdsFriendError = new Error('Same ids need not be friends!');
-      sameIdsFriendError.code = '00000';
+      const sameIdsFriendError = new Error("Same ids need not be friends!");
+      sameIdsFriendError.code = "00000";
       throw sameIdsFriendError;
     }
 
@@ -43,12 +43,12 @@ router.post('/add', async (req, res) => {
 
     if (isRequestSent) {
       const pendingFriendRequestError = new Error(`A request is already is sent!`);
-      pendingFriendRequestError.code = '23505';
+      pendingFriendRequestError.code = "23505";
       throw pendingFriendRequestError;
     }
     
     const requestCode = generateRequestCode();
-    const requestHash = crypto.createHash('sha256').update(sentBy + requestCode + sentTo).digest('hex');
+    const requestHash = crypto.createHash("sha256").update(sentBy + requestCode + sentTo).digest("hex");
     console.log("::" + sentBy + requestCode + sentTo);
     console.log("::" + requestHash);
     
@@ -67,7 +67,7 @@ router.post('/add', async (req, res) => {
 
     // Friend request can be accepted only in the app, email link will redirect to the in-app activities
       // list where accept button for the request will be there
-    // No need for this, because at last while verifying with DB the request won't exist
+    // No need for this, because at last while verifying with DB the request won"t exist
     // So, accept button will be there in both Email and in-app activities
 
     const html = `
@@ -98,7 +98,7 @@ router.post('/add', async (req, res) => {
       </body>
     <html>`;
       
-    // sendMail(sentToEmail, 'New Friend Request', html);
+    // sendMail(sentToEmail, "New Friend Request", html);
 
     // TODO Front-end
     // users({sentBy}).name sent a request to users({sentTo}).name -- Accept button
@@ -113,25 +113,25 @@ router.post('/add', async (req, res) => {
       // Including updated_at COLUMNS of related Tables
 
     res.status(201).json({
-      message: 'Friend request sent successfully!',
+      message: "Friend request sent successfully!",
       sentByEmail,
       sentToEmail
     });
   } catch (err) {
-    console.error('Error adding friend:', err.message);
+    console.error("Error adding friend:", err.message);
 
-    if (err.code === '00000' || err.code === '23505') {
+    if (err.code === "00000" || err.code === "23505") {
       res.status(409).json({ message: err.message });
     } else {
-      res.status(500).json({ message: 'An error occured!' });
+      res.status(500).json({ message: "An error occured!" });
     }
   }
 });
 
-router.get('/get-all-by-user-id/:userId', async (req, res) => {
+router.get("/get-all-by-user-id/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
-    console.log('Request -- User id:', userId);
+    console.log("Request -- User id:", userId);
 
     const { rowCount: friendCount, rows: friends } = await db.query(
       `SELECT * FROM friends
@@ -140,27 +140,27 @@ router.get('/get-all-by-user-id/:userId', async (req, res) => {
     );
 
     if (friendCount == 0) {
-      const noFriendError = new Error('No friends exist!');
-      noFriendError.code = '00000';
+      const noFriendError = new Error("No friends exist!");
+      noFriendError.code = "00000";
       throw noFriendError;
     }
 
     res.status(200).json({ friendCount, friends});
   } catch (err) {
-    console.error('Error fetching all friends:', err.message);
+    console.error("Error fetching all friends:", err.message);
 
-    if (err.code === '00000') {
+    if (err.code === "00000") {
       res.status(403).json({ message: err.message });
     } else {
-      res.status(500).json({ message: 'An error occured!' });
+      res.status(500).json({ message: "An error occured!" });
     }
   }
 });
 
-router.put('/accept', async (req, res) => {
+router.put("/accept", async (req, res) => {
   const friendRequest = req.query.request;
-  const [sentTo, requestCode, sentBy] = friendRequest.split('-');
-  const requestHash = crypto.createHash('sha256').update(sentBy + requestCode + sentTo).digest('hex');
+  const [sentTo, requestCode, sentBy] = friendRequest.split("-");
+  const requestHash = crypto.createHash("sha256").update(sentBy + requestCode + sentTo).digest("hex");
 
   try {
     const rowCount = (await db.query(
@@ -171,19 +171,19 @@ router.put('/accept', async (req, res) => {
     )).rowCount;
 
     if (rowCount == 0) {
-      const noFriendRequestError = new Error('No pending friend request exist OR Already friends!');
-      noFriendRequestError.code = '000000';
+      const noFriendRequestError = new Error("No pending friend request exist OR Already friends!");
+      noFriendRequestError.code = "000000";
       throw noFriendRequestError;
     }
     
-    res.status(200).json({ message: '' });
+    res.status(200).json({ message: "" });
   } catch (err) {
-    console.error('Error accepting request:', err.message);
+    console.error("Error accepting request:", err.message);
 
-    if (err.code === '000000') {
+    if (err.code === "000000") {
       res.status(403).json({ message: err.message });
     } else {
-      res.status(500).json({ message: 'An error occured!' });
+      res.status(500).json({ message: "An error occured!" });
     }
   }
 });
