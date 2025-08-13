@@ -118,7 +118,7 @@ router.post("/add", async (req, res) => {
       sentToEmail
     });
   } catch (err) {
-    console.error("Error adding friend:", err.message);
+    console.error("Error adding friend:", err);
 
     if (err.code === "00000" || err.code === "23505") {
       res.status(409).json({ message: err.message });
@@ -147,7 +147,7 @@ router.get("/get-all-by-user-id/:userId", async (req, res) => {
 
     res.status(200).json({ friendCount, friends});
   } catch (err) {
-    console.error("Error fetching all friends:", err.message);
+    console.error("Error fetching all friends:", err);
 
     if (err.code === "00000") {
       res.status(403).json({ message: err.message });
@@ -178,7 +178,7 @@ router.put("/accept", async (req, res) => {
     
     res.status(200).json({ message: "" });
   } catch (err) {
-    console.error("Error accepting request:", err.message);
+    console.error("Error accepting request:", err);
 
     if (err.code === "000000") {
       res.status(403).json({ message: err.message });

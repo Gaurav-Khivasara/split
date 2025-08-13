@@ -42,7 +42,7 @@ router.post("/add", async (req, res) => {
       expenseDescription
     });
   } catch (err) {
-    console.error("Error adding share:", err.message);
+    console.error("Error adding share:", err);
 
     if (err.code === "23505") {
       res.status(409).json({ message: "User share already exists for this expense!" });
@@ -78,7 +78,7 @@ router.get("/get-all-by-expense-id/:expenseId", async (req, res) => {
 
     res.status(200).json({ rowCount, expenseId, rows });
   } catch (err) {
-    console.error("Error fetching shares:", err.message);
+    console.error("Error fetching shares:", err);
 
     if (err.code === "00000") {
       res.status(403).json({ message: err.message });

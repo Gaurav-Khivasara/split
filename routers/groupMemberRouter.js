@@ -60,7 +60,7 @@ router.post("/add", async (req, res) => {
       userEmail
     });
   } catch (err) {
-    console.error("Error adding member:", err.message);
+    console.error("Error adding member:", err);
 
     if (err.code === "23505") {
       res.status(409).json({ message: "User already exists in the group!" });

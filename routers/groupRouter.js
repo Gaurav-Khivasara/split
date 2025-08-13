@@ -40,7 +40,7 @@ router.post("/add", async (req, res) => {
       name
     });
   } catch(err) {
-    console.error("Error creating group:", err.message);
+    console.error("Error creating group:", err);
 
     res.status(500).json({ message: "An error occured!" });
   }
@@ -69,7 +69,7 @@ router.get("/get-all-by-user-id/:userId", async (req, res) => {
 
     res.status(200).json({ groupCount, groups });
   } catch (err) {
-    console.error("Error fetching all groups:", err.message);
+    console.error("Error fetching all groups:", err);
 
     if (err.code === "00000") {
       res.status(403).json({ message: err.message });

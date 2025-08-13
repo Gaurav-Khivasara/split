@@ -42,7 +42,7 @@ router.post("/add", async (req, res) => {
       message: "Expense added successfully!",
     });
   } catch (err) {
-    console.error("Error adding expense:", err.message);
+    console.error("Error adding expense:", err);
 
     if (err.code === "00000") {
       res.status(403).json({ message: err.message });
@@ -96,7 +96,7 @@ router.get("/get-all-by-group-id/:groupId", async (req, res) => {
 
     res.status(200).json({ totExpenses, expenseCount, expenses});
   } catch (err) {
-    console.error("Error fetching all expenses:", err.message);
+    console.error("Error fetching all expenses:", err);
 
     if (err.code === "00000") {
       res.status(403).json({ message: err.message });
@@ -147,7 +147,7 @@ router.get("/get-all-by-user-id/:userId", async (req, res) => {
 
     res.status(200).json({ expenseCount, expenses});
   } catch (err) {
-    console.error("Error fetching all expenses:", err.message);
+    console.error("Error fetching all expenses:", err);
 
     if (err.code === "00000") {
       res.status(403).json({ message: err.message });
