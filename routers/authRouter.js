@@ -19,7 +19,7 @@ router.get("/callback",
     const token = jwt.sign(
       { id: req.user.id, name: req.user.name, email: req.user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1m" }
+      { expiresIn: "1d" }
     );
 
     res.redirect(frontendLink + ":" + frontendPort + "/auth/callback?token=" + token);
