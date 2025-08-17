@@ -173,11 +173,11 @@ router.get("/get-all-by-user", async (req, res) => {
 });
 
 router.put("/accept", async (req, res) => {
-  const friendRequest = req.query.request;
-  const [sentTo, requestCode, sentBy] = friendRequest.split("-");
-  const requestHash = crypto.createHash("sha256").update(sentBy + requestCode + sentTo).digest("hex");
-
   try {
+    const friendRequest = req.query.request;
+    const [sentTo, requestCode, sentBy] = friendRequest.split("-");
+    const requestHash = crypto.createHash("sha256").update(sentBy + requestCode + sentTo).digest("hex");
+
     const rowCount = (await db.query(
       `UPDATE friends SET are_friends = true
       WHERE request_hash = $1 AND are_friends = false
