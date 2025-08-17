@@ -26,7 +26,6 @@ router.get("", (req, res) => {
 
 router.post("/add", async (req, res) => {
   try {
-    console.log("--:", req.body);
     const { sentBy, sentTo } = req.body;
     console.log("Request -- Friend request details:", sentBy + ", " + sentTo);
 
