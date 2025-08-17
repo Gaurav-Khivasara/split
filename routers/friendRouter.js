@@ -11,7 +11,7 @@ const crypto = require("crypto");
 
 function generateRequestCode() {
   const alphaNumerics = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456";
-  
+
   let requestCode = "";
   for (let i = 0; i < 6; i++) {
     requestCode += alphaNumerics[Math.floor(Math.random() * 62)];
@@ -26,48 +26,45 @@ router.get("", (req, res) => {
 
 router.post("/add", async (req, res) => {
   try {
+    console.log("--:", req.body);
     const { sentBy, sentTo } = req.body;
     console.log("Request -- Friend request details:", sentBy + ", " + sentTo);
 
-    if (sentBy == sentTo) {
-      const sameIdsFriendError = new Error("Same ids need not be friends!");
-      sameIdsFriendError.code = "00000";
-      throw sameIdsFriendError;
+    if (sentBy === sentTo) {
+      const sameEmailFriendsError = new Error("Same emails need not be friends!");
+      sameEmailFriendsError.code = "00000";
+      throw sameEmailFriendsError;
     }
 
     const isRequestSent = (await db.query(
       `SELECT * FROM friends
-      WHERE (sent_to = $1 AND sent_by = $2) OR (sent_by = $1 AND sent_to = $2)`,
+      WHERE (sent_by = $1 AND sent_to = $2) OR (sent_to = $1 AND sent_by = $2)`,
       [sentBy, sentTo]
     )).rowCount > 0;
 
     if (isRequestSent) {
-      const pendingFriendRequestError = new Error(`A request is already is sent!`);
+      const pendingFriendRequestError = new Error("A request is already is sent!");
       pendingFriendRequestError.code = "23505";
       throw pendingFriendRequestError;
     }
-    
+
     const requestCode = generateRequestCode();
     const requestHash = crypto.createHash("sha256").update(sentBy + requestCode + sentTo).digest("hex");
-    console.log("::" + sentBy + requestCode + sentTo);
-    console.log("::" + requestHash);
-    
+    console.log("::", sentBy + ", " + requestCode + ", " + sentTo);
+    console.log("::", requestHash);
+
     await db.query(
       `INSERT INTO friends (sent_by, sent_to, request_hash)
-      VALUES ($1, $2, $3) RETURNING *`,
+      VALUES ($1, $2, $3)`,
       [sentBy, sentTo, requestHash]
     );
-    
+
     // TODO 0
     // Send email friend request with accept button
-    const [{ email: sentByEmail }, { email: sentToEmail }] = (await db.query(
-      `SELECT email FROM users WHERE id IN ($1, $2)`,
-      [sentBy, sentTo]
-    )).rows;
 
     // Friend request can be accepted only in the app, email link will redirect to the in-app activities
       // list where accept button for the request will be there
-    // No need for this, because at last while verifying with DB the request won"t exist
+    // No need for this, because at last while verifying with DB the request won't exist
     // So, accept button will be there in both Email and in-app activities
 
     const html = `
@@ -97,14 +94,14 @@ router.post("/add", async (req, res) => {
         <a href="${serverLink}:${serverPort}/api/friends/accept?request=${sentTo}-${requestCode}-${sentBy}" >Accept</a>
       </body>
     <html>`;
-      
-    // sendMail(sentToEmail, "New Friend Request", html);
+
+    // sendMail(sentTo, `New Friend Request from ${sentBy}`, html);
 
     // TODO Front-end
     // users({sentBy}).name sent a request to users({sentTo}).name -- Accept button
       // Date Time
     // Add to activities table (activities for each user will be different)
-      // Instead of adding to activities table (as no table for frined activities)
+      // Instead of adding to activities table (as no table for friend activities)
       // Just add to activities list in app whenever a request is sent and if it is accepted it will
         // disappear from the list
 
@@ -114,8 +111,8 @@ router.post("/add", async (req, res) => {
 
     res.status(201).json({
       message: "Friend request sent successfully!",
-      sentByEmail,
-      sentToEmail
+      sentBy,
+      sentTo
     });
   } catch (err) {
     console.error("Error adding friend:", err);
@@ -128,15 +125,21 @@ router.post("/add", async (req, res) => {
   }
 });
 
-router.get("/get-all-by-user-id/:userId", async (req, res) => {
+router.get("/get-all-by-user", async (req, res) => {
   try {
-    const userId = req.params.userId;
-    console.log("Request -- User id:", userId);
+    // const userId = req.params.userId;
+    const userEmail = req.user.email;
+    console.log("Request -- User email:", userEmail);
 
     const { rowCount: friendCount, rows: friends } = await db.query(
-      `SELECT * FROM friends
-      WHERE (sent_by = $1 OR sent_to = $1) AND are_friends = true`,
-      [userId]
+      `SELECT u.id, u.name FROM users u
+      JOIN friends f ON u.email = f.sent_to
+      WHERE f.sent_by = $1 AND are_friends = true
+      UNION
+      SELECT u.id, u.name FROM users u
+      JOIN friends f ON u.email = f.sent_by
+      WHERE f.sent_to = $1 AND are_friends = true`,
+      [userEmail]
     );
 
     if (friendCount == 0) {
@@ -145,7 +148,20 @@ router.get("/get-all-by-user-id/:userId", async (req, res) => {
       throw noFriendError;
     }
 
-    res.status(200).json({ friendCount, friends});
+    // const x = [];
+    // for (let i = 0; i < friendIds.length; i++) {
+    //   if (friendIds[i].sent_by != userId) {
+    //     x.push(friendIds[i].sent_by);
+    //   } else {
+    //     x.push(friendIds[i].sent_to)
+    //   }
+    // }
+
+    // for (let i = 0; i < x.length; i++) {
+    //   console.log(x[i]);
+    // }
+
+    res.status(200).json({ friendCount, friends });
   } catch (err) {
     console.error("Error fetching all friends:", err);
 
@@ -175,8 +191,8 @@ router.put("/accept", async (req, res) => {
       noFriendRequestError.code = "000000";
       throw noFriendRequestError;
     }
-    
-    res.status(200).json({ message: "" });
+
+    res.status(200).json({ message: "Friend request accepted!" });
   } catch (err) {
     console.error("Error accepting request:", err);
 
