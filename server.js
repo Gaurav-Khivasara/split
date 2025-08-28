@@ -31,11 +31,11 @@ const apiRouters = require("./routers/apiRouters");
 app.use("/api", (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Missing or Invalid token!" });
-  }
+  // if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  //   return res.status(401).json({ message: "Missing token!" });
+  // }
 
-  const token = authHeader.split(" ")[1];
+  const token = authHeader?.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -44,9 +44,13 @@ app.use("/api", (req, res, next) => {
   } catch (err) {
     console.error("JWT middleware auth error:", err);
 
-    res.status(401).json({ message: "Invalid token!" });
+    res.status(401).json({ message: "Missing or Invalid token!" });
   }
 }, apiRouters);
+
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found!" })
+});
 
 const cyanANSI = "\x1b[36m";
 const boldANSI = "\x1b[1m";
