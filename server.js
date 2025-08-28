@@ -1,5 +1,5 @@
-// // TODO 0
-// // payments table in DB and its logic
+// Completed TODO
+// payments table in DB and its logic
 
 require("dotenv").config();
 const serverLink = process.env.SERVER_LINK;

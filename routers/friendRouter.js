@@ -38,7 +38,7 @@ router.post("/add", async (req, res) => {
       throw pendingFriendRequestError;
     }
 
-    // TODO 0
+    // Completed TODO
     // Send email friend request with accept button
 
     // Friend request can be accepted only in the app, email link will redirect to the in-app activities
